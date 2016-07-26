@@ -37,7 +37,9 @@ class RnSortApp extends Component {
                 style={styles.sortInput}
                 onChangeText={(text) => {
                     this.setState({text: text});
-                    this.setState({dataSource: this.state.dataSource.cloneWithRows(mergeSort(text.split(","), true))});
+                    if (text.substr(text.length - 1) != ",") {
+                      this.setState({dataSource: this.state.dataSource.cloneWithRows(mergeSort(text.split(","), true))});
+                    }
                 }}
                 value={this.state.text}
             />
