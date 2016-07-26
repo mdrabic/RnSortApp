@@ -37,7 +37,7 @@ class RnSortApp extends Component {
                 style={styles.sortInput}
                 onChangeText={(text) => {
                     this.setState({text: text});
-                    this.setState({dataSource: this.state.dataSource.cloneWithRows(mergeSort(text.split(",")))});
+                    this.setState({dataSource: this.state.dataSource.cloneWithRows(mergeSort(text.split(","), true))});
                 }}
                 value={this.state.text}
             />
@@ -55,8 +55,7 @@ class RnSortApp extends Component {
 
 // Merge sort implementation adapted from:
 // http://www.stoimen.com/blog/2010/07/02/friday-algorithms-javascript-merge-sort/
-function mergeSort(arr)
-{
+function mergeSort(arr, finalCall) {
     if (arr.length < 2)
         return arr;
 
@@ -64,12 +63,14 @@ function mergeSort(arr)
     var left   = arr.slice(0, middle);
     var right  = arr.slice(middle, arr.length);
 
-    return merge(mergeSort(left), mergeSort(right));
+    return merge(mergeSort(left, false), mergeSort(right, false), finalCall);
 }
 
-function merge(left, right)
-{
+function merge(left, right, finalCall) {
     var result = [];
+
+    if (finalCall)
+      return alternatingMerge(left, right);
 
     while (left.length && right.length) {
         if (parseInt(left[0]) <= parseInt(right[0])) {
@@ -86,6 +87,48 @@ function merge(left, right)
         result.push(right.shift());
 
     return result;
+}
+
+function alternatingMerge(left, right) {
+  var result = [];
+  var alternate = false;
+
+  while (left.length && right.length) {
+    if (parseInt(left[0]) <= parseInt(right[0])) {
+        if (alternate) {
+          result.push(right.shift());
+        } else {
+          result.push(left.shift());
+        }
+    } else {
+      if (alternate) {
+        result.push(left.shift());
+      } else {
+        result.push(right.shift());
+      }
+    }
+    alternate = !alternate;
+  }
+
+  while (left.length) {
+    if (alternate) {
+      result.push(left.pop());
+    } else {
+      result.push(left.shift());
+    }
+    alternate = !alternate;
+  }
+
+  while (right.length) {
+    if (alternate) {
+      result.push(right.pop());
+    } else {
+      result.push(right.shift());
+    }
+    alternate = !alternate;
+  }
+
+  return result;
 }
 
 const styles = StyleSheet.create({
